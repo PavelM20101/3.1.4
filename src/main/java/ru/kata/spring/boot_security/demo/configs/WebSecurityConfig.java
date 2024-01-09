@@ -19,21 +19,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private SuccessUserHandler successUserHandler;
 
-
-
-
-
-
-    // SuccessHandler это обработчик успешной аутентификации
-    // UserDetails - минимальная информация о пользователях (логин, пароль и тд)
-
-//    @Autowired
-//    public WebSecurityConfig(SuccessUserHandler successUserHandler
-//            , @Qualifier("userServiceImpl") UserDetailsService userDetailsService) {
-//        this.successUserHandler = successUserHandler;
-//        this.userDetailsService = userDetailsService;
-//    }
-
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.authenticationProvider(daoAuthenticationProvider());
@@ -58,21 +43,20 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception { // конфиги в которых указывается доступы пользователей
+    protected void configure(HttpSecurity http) throws Exception {
         http
                 .cors().disable()
-                .csrf().disable() //  защита от CSRF-атак( типо подставного сайта где злоумышленник его использует и заставляет
-                // от имени пользователя отправлять пароли, деньги со счёта на счёт и т.п
-                .authorizeRequests() //авторизацуем запрос
+                .csrf().disable()
+                .authorizeRequests()
                 .antMatchers("/login", "/", "/api/**").permitAll()
-                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN") //прописываем доступ для юрл /user/**
-                .antMatchers("/admin/**").hasRole("ADMIN") //прописываем доступ для юрл /admin/**
-                .anyRequest().authenticated() // все запросы должны быть авторизованы и аутентифицированы
+                .antMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                .antMatchers("/admin/**").hasRole("ADMIN")
+                .anyRequest().authenticated()
                 .and()
-                .formLogin() // задаю форму для ввода логина-пароля, по дефолту это "/login"
+                .formLogin()
                 .successHandler(successUserHandler)
-                .permitAll() // доступно всем
+                .permitAll()
                 .and()
-                .logout().permitAll(); // настройка логаута
+                .logout().permitAll();
     }
 }
